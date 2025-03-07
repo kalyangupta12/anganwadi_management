@@ -43,6 +43,8 @@
       display: block;
       cursor: pointer;
       transition: background ease 0.2s;
+      flex: 1;
+      text-align: center;
     }
     
     .tab-content {
@@ -105,7 +107,7 @@
     <div class="tabs w-full">
       <!-- Children Details Tab -->
       <input type="radio" name="tabs" id="tab-children" class="tab-input" checked>
-      <label for="tab-children" class="tab-label text-lg py-3 w-1/3 text-center">Children Details</label>
+      <label for="tab-children" class="tab-label text-lg py-3">Children Details</label>
       <div class="tab-content p-4">
         <!-- Children Details Content -->
         <div class="space-y-6">
@@ -262,7 +264,7 @@
 
       <!-- Ration Distribution Tab -->
       <input type="radio" name="tabs" id="tab-ration" class="tab-input">
-      <label for="tab-ration" class="tab-label text-lg py-3 w-1/3 text-center">Ration Distribution</label>
+      <label for="tab-ration" class="tab-label text-lg py-3">Ration Distribution</label>
       <div class="tab-content p-4">
         <!-- Ration Distribution Content -->
         <div class="space-y-6">
@@ -347,103 +349,6 @@
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200" id="rationTableBody">
                     <!-- Ration rows will be populated by JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Attendance Tab -->
-      <input type="radio" name="tabs" id="tab-attendance" class="tab-input">
-      <label for="tab-attendance" class="tab-label text-lg py-3 w-1/3 text-center">Attendance</label>
-      <div class="tab-content p-4">
-        <!-- Attendance Content -->
-        <div class="space-y-6">
-          <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input type="date" id="attendanceDate" class="w-full sm:w-auto rounded-md border border-gray-300 px-3 py-2" />
-              <button class="bg-govt-blue text-white px-4 py-2 rounded hover:bg-govt-dark-blue transition-colors">
-                Take Attendance
-              </button>
-            </div>
-            <div class="w-full md:w-1/3">
-              <input 
-                type="search" 
-                placeholder="Search by name or ID" 
-                id="attendanceSearch"
-                class="w-full h-10 rounded-md border border-gray-300 px-3 py-2"
-              />
-            </div>
-          </div>
-
-          <!-- Attendance Stats Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-white p-4 shadow rounded-md border-l-4 border-green-500">
-              <div class="flex items-center">
-                <div class="mr-4 bg-green-100 p-3 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <p class="text-gray-500 text-sm">Present Today</p>
-                  <p class="text-2xl font-bold">18</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-white p-4 shadow rounded-md border-l-4 border-red-500">
-              <div class="flex items-center">
-                <div class="mr-4 bg-red-100 p-3 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <div>
-                  <p class="text-gray-500 text-sm">Absent Today</p>
-                  <p class="text-2xl font-bold">7</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-white p-4 shadow rounded-md border-l-4 border-blue-500">
-              <div class="flex items-center">
-                <div class="mr-4 bg-blue-100 p-3 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p class="text-gray-500 text-sm">Monthly Attendance</p>
-                  <p class="text-2xl font-bold">72%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Attendance Records Table -->
-          <div class="bg-white shadow-md rounded-lg">
-            <div class="p-4 border-b">
-              <h2 class="text-xl font-bold">Attendance Records</h2>
-              <p class="text-sm text-gray-500">Showing records for Today</p>
-            </div>
-            <div class="p-6">
-              <div class="rounded-md border overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marked By</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200" id="attendanceTableBody">
-                    <!-- Attendance rows will be populated by JavaScript -->
                   </tbody>
                 </table>
               </div>
@@ -566,50 +471,6 @@
       },
     ];
 
-    // Mock data for attendance
-    const attendanceRecords = [
-      {
-        id: 1,
-        child_id: 'DL001C001',
-        name: 'Aarav Sharma',
-        time: '09:15 AM',
-        status: 'Present',
-        marked_by: 'Kavita Kumari'
-      },
-      {
-        id: 2,
-        child_id: 'DL001C002',
-        name: 'Priya Patel',
-        time: '09:20 AM',
-        status: 'Present',
-        marked_by: 'Kavita Kumari'
-      },
-      {
-        id: 3,
-        child_id: 'DL001C003',
-        name: 'Arjun Singh',
-        time: '09:30 AM',
-        status: 'Present',
-        marked_by: 'Kavita Kumari'
-      },
-      {
-        id: 4,
-        child_id: 'DL001C004',
-        name: 'Ishita Verma',
-        time: '00:00',
-        status: 'Absent',
-        marked_by: 'Kavita Kumari'
-      },
-      {
-        id: 5,
-        child_id: 'DL001C005',
-        name: 'Rohan Kumar',
-        time: '09:45 AM',
-        status: 'Present',
-        marked_by: 'Kavita Kumari'
-      }
-    ];
-
     // Helper functions
     function calculateAge(dob) {
       const birthDate = new Date(dob);
@@ -699,44 +560,6 @@
       });
     }
 
-    // Populate attendance table
-    function populateAttendanceTable(attendanceData) {
-      const tableBody = document.getElementById('attendanceTableBody');
-      tableBody.innerHTML = '';
-      
-      if (attendanceData.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td colspan="6" class="px-6 py-4 text-center">No attendance records found</td>
-        `;
-        tableBody.appendChild(row);
-        return;
-      }
-      
-      attendanceData.forEach(record => {
-        const row = document.createElement('tr');
-        const statusClass = record.status === 'Present' ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100';
-        
-        row.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap">${record.child_id}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${record.name}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${record.time}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">
-              ${record.status}
-            </span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">${record.marked_by}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <button class="border-govt-blue text-govt-blue border px-3 py-1 text-sm rounded hover:bg-govt-light-blue transition-colors">
-              Update
-            </button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
     // Search functionality for children
     document.getElementById('childSearch').addEventListener('input', function(e) {
       const searchTerm = e.target.value.toLowerCase();
@@ -757,16 +580,6 @@
         ration.ration_type.toLowerCase().includes(searchTerm)
       );
       populateRationTable(filteredRations);
-    });
-
-    // Search functionality for attendance
-    document.getElementById('attendanceSearch').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredAttendance = attendanceRecords.filter(record => 
-        record.name.toLowerCase().includes(searchTerm) || 
-        record.child_id.toLowerCase().includes(searchTerm)
-      );
-      populateAttendanceTable(filteredAttendance);
     });
 
     // Toggle forms
@@ -801,7 +614,6 @@
     document.addEventListener('DOMContentLoaded', function() {
       populateChildrenTable(children);
       populateRationTable(rationDistributions);
-      populateAttendanceTable(attendanceRecords);
       
       // Set current date in attendance date picker
       const today = new Date();
