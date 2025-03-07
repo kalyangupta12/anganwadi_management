@@ -6,13 +6,18 @@
     <title>Pratham Path - Empowering Education in Assam</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css"
       rel="stylesheet"
     />
+    <style>
+      *{
+        font-family: 'Poppins', sans-serif;
+      }
+    </style>
     <script>
       tailwind.config = {
         theme: {
@@ -189,7 +194,7 @@
           <!-- Logo and title section -->
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center space-x-4">
-              <img src="/assets/logo.png" alt="Siksha Logo" class="h-16" />
+              <img src="./assets/logo.png" alt="Siksha Logo" class="h-16" />
               <div>
                 <h1 class="text-2xl font-bold text-govt-dark-blue">
                   Pratham Path
@@ -287,7 +292,7 @@
                 >Resources</a
               >
               <a
-                href="/attendance.html"
+                href="./attendance.php"
                 class="px-4 py-3 hover:bg-govt-dark-blue transition-colors flex items-center"
               >
                 <svg
@@ -497,7 +502,7 @@
                 class="aspect-[4/3] rounded-md overflow-hidden bg-white flex items-center justify-center"
               >
                 <img
-                  src="/assets/anganwadi.png"
+                  src="./assets/anganwadi.png"
                   alt="Anganwadi classroom"
                   class="w-full h-full object-cover"
                 />
@@ -508,7 +513,7 @@
                   class="w-full h-full bg-white rounded-full shadow-lg overflow-hidden transform rotate-12"
                 >
                   <img
-                    src="/assets/roundchild.png"
+                    src="./assets/roundchild.png"
                     alt="Children around globe"
                     class="w-full h-full object-contain"
                   />
@@ -1711,7 +1716,7 @@
           <div class="mb-4 flex flex-col items-center">
             <div class="w-16 h-full mb-2">
               <img
-                src="/assets/image.png"
+                src="./assets/image.png"
                 alt="National Emblem of India"
                 class="w-full h-full"
               />
