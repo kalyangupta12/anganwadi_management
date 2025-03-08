@@ -326,7 +326,7 @@
               href="#contact"
               class="px-4 py-3 hover:bg-govt-dark-blue transition-colors">Contact</a>
           </div>
-          <a href="../auth/login.php">
+          <a href="../admin/login.php">
             <div class="px-4 py-3 bg-govt-dark-blue flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -485,16 +485,16 @@
             <div
               class="aspect-[4/3] rounded-md overflow-hidden bg-white flex items-center justify-center">
               <img
-                src="./assets/anganwadi.png"
+                src="./assets/anganwadi.jpg"
                 alt="Anganwadi classroom"
                 class="w-full h-full object-cover" />
             </div>
 
             <div class="absolute -bottom-6 -right-6 w-28 h-28 animate-float">
               <div
-                class="w-full h-full bg-white rounded-full shadow-lg overflow-hidden transform rotate-12">
+                class="w-full h-full bg-white rounded-full shadow-lg overflow-hidden ">
                 <img
-                  src="./assets/roundchild.png"
+                  src="./assets/pratham.jpg"
                   alt="Children around globe"
                   class="w-full h-full object-contain" />
               </div>
