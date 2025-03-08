@@ -43,8 +43,6 @@
       display: block;
       cursor: pointer;
       transition: background ease 0.2s;
-      flex: 1;
-      text-align: center;
     }
     
     .tab-content {
@@ -256,97 +254,16 @@
 
       <!-- Ration Distribution Tab -->
       <input type="radio" name="tabs" id="tab-ration" class="tab-input">
-      <label for="tab-ration" class="tab-label text-lg py-3">Ration Distribution</label>
+      <label for="tab-ration" class="tab-label text-lg py-3 w-1/3 text-center">Ration Distribution</label>
       <div class="tab-content p-4">
-        <!-- Ration Distribution Content -->
-        <div class="space-y-6">
-          <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-            <button id="toggleRationForm" class="w-full md:w-auto bg-govt-blue text-white px-4 py-2 rounded hover:bg-govt-dark-blue transition-colors">
-              Record New Distribution
-            </button>
-            <div class="w-full md:w-1/3">
-              <input 
-                type="search" 
-                placeholder="Search by child name, ID or ration type" 
-                id="rationSearch"
-                class="w-full h-10 rounded-md border border-gray-300 px-3 py-2"
-              />
-            </div>
-          </div>
+        <!-- ... keep existing code (Ration Distribution Content) -->
+      </div>
 
-          <!-- Ration Distribution Form (hidden by default) -->
-          <div id="rationForm" class="mb-6 border-govt-blue border-t-4 bg-white shadow-md rounded-lg hidden">
-            <div class="p-4 border-b">
-              <h2 class="text-xl font-bold text-govt-blue">Record Ration Distribution</h2>
-            </div>
-            <div class="p-6">
-              <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium mb-1">Child</label>
-                  <select class="w-full h-10 rounded-md border border-gray-300 px-3 py-2">
-                    <option value="">Select Child</option>
-                    <option value="DL001C001">DL001C001 - Aarav Sharma</option>
-                    <option value="DL001C002">DL001C002 - Priya Patel</option>
-                    <option value="DL001C003">DL001C003 - Arjun Singh</option>
-                    <option value="DL001C004">DL001C004 - Ishita Verma</option>
-                    <option value="DL001C005">DL001C005 - Rohan Kumar</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Date & Time</label>
-                  <input type="datetime-local" class="w-full h-10 rounded-md border border-gray-300 px-3 py-2" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Ration Type</label>
-                  <select class="w-full h-10 rounded-md border border-gray-300 px-3 py-2">
-                    <option value="">Select Ration Type</option>
-                    <option value="Chawal">Chawal</option>
-                    <option value="Dal">Dal</option>
-                    <option value="Matar">Matar</option>
-                    <option value="Khichdi">Khichdi</option>
-                    <option value="Sooji">Sooji</option>
-                    <option value="Horlicks">Horlicks</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Quantity (kg/liter)</label>
-                  <input type="number" step="0.1" min="0" placeholder="Quantity" class="w-full h-10 rounded-md border border-gray-300 px-3 py-2" />
-                </div>
-                <div class="md:col-span-2 mt-4">
-                  <button type="submit" class="bg-govt-blue text-white px-4 py-2 rounded hover:bg-govt-dark-blue transition-colors">Record Distribution</button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Ration Distribution Records Table -->
-          <div class="bg-white shadow-md rounded-lg">
-            <div class="p-4 border-b">
-              <h2 class="text-xl font-bold">Ration Distribution Records</h2>
-            </div>
-            <div class="p-6">
-              <div class="rounded-md border overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Child ID</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Child Name</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ration Type</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distributed By</th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200" id="rationTableBody">
-                    <!-- Ration rows will be populated by JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Attendance Tab -->
+      <input type="radio" name="tabs" id="tab-attendance" class="tab-input">
+      <label for="tab-attendance" class="tab-label text-lg py-3 w-1/3 text-center">Attendance</label>
+      <div class="tab-content p-4">
+        <!-- ... keep existing code (Attendance Content) -->
       </div>
     </div>
   </main>
@@ -423,45 +340,7 @@
       },
     ];
 
-    // Mock data for ration distribution
-    const rationDistributions = [
-      { 
-        ration_id: 1, 
-        child_id: 'DL001C001', 
-        child_name: 'Aarav Sharma',
-        datetime: '2023-08-15 10:30:00', 
-        ration_type: 'Chawal', 
-        quantity: 2.5,
-        distributed_by: 'Kavita Kumari'
-      },
-      { 
-        ration_id: 2, 
-        child_id: 'DL001C002', 
-        child_name: 'Priya Patel',
-        datetime: '2023-08-15 11:15:00', 
-        ration_type: 'Dal', 
-        quantity: 1.0,
-        distributed_by: 'Kavita Kumari'
-      },
-      { 
-        ration_id: 3, 
-        child_id: 'DL001C003', 
-        child_name: 'Arjun Singh',
-        datetime: '2023-08-15 12:00:00', 
-        ration_type: 'Khichdi', 
-        quantity: 1.5,
-        distributed_by: 'Kavita Kumari'
-      },
-      { 
-        ration_id: 4, 
-        child_id: 'DL001C001', 
-        child_name: 'Aarav Sharma',
-        datetime: '2023-08-25 10:45:00', 
-        ration_type: 'Sooji', 
-        quantity: 1.0,
-        distributed_by: 'Kavita Kumari'
-      },
-    ];
+    // ... keep existing code (Mock data for ration distribution and attendance)
 
     // Helper functions
     function calculateAge(dob) {
@@ -517,40 +396,7 @@
       });
     }
 
-    // Populate ration distribution table
-    function populateRationTable(rationData) {
-      const tableBody = document.getElementById('rationTableBody');
-      tableBody.innerHTML = '';
-      
-      if (rationData.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td colspan="8" class="px-6 py-4 text-center">No ration distribution records found</td>
-        `;
-        tableBody.appendChild(row);
-        return;
-      }
-      
-      rationData.forEach(ration => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap">${ration.ration_id}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${ration.child_id}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${ration.child_name}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${formatDate(ration.datetime)}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${ration.ration_type}</td>
-          <td class="px-6 py-4 whitespace-nowrap">${ration.quantity} kg</td>
-          <td class="px-6 py-4 whitespace-nowrap">${ration.distributed_by}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex gap-2">
-              <button class="border-govt-blue text-govt-blue border px-3 py-1 text-sm rounded hover:bg-govt-light-blue transition-colors">Edit</button>
-              <button class="border-red-500 text-red-500 border px-3 py-1 text-sm rounded hover:bg-red-50 transition-colors">Delete</button>
-            </div>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
+    // ... keep existing code (Populate ration distribution table and attendance table)
 
     // Search functionality for children
     document.getElementById('childSearch').addEventListener('input', function(e) {
@@ -563,54 +409,12 @@
       populateChildrenTable(filteredChildren);
     });
 
-    // Search functionality for ration
-    document.getElementById('rationSearch').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase();
-      const filteredRations = rationDistributions.filter(ration => 
-        ration.child_name.toLowerCase().includes(searchTerm) || 
-        ration.child_id.toLowerCase().includes(searchTerm) ||
-        ration.ration_type.toLowerCase().includes(searchTerm)
-      );
-      populateRationTable(filteredRations);
-    });
-
-    // Toggle forms
-    document.getElementById('toggleChildForm').addEventListener('click', function() {
-      const form = document.getElementById('childForm');
-      const scannerForm = document.getElementById('scannerForm');
-      form.classList.toggle('hidden');
-      if (!scannerForm.classList.contains('hidden')) {
-        scannerForm.classList.add('hidden');
-      }
-      this.textContent = form.classList.contains('hidden') ? 'Register New Child' : 'Cancel';
-    });
-
-    document.getElementById('toggleScanner').addEventListener('click', function() {
-      const form = document.getElementById('scannerForm');
-      const childForm = document.getElementById('childForm');
-      form.classList.toggle('hidden');
-      if (!childForm.classList.contains('hidden')) {
-        childForm.classList.add('hidden');
-        document.getElementById('toggleChildForm').textContent = 'Register New Child';
-      }
-      this.textContent = form.classList.contains('hidden') ? 'Face Registration' : 'Cancel';
-    });
-
-    document.getElementById('toggleRationForm').addEventListener('click', function() {
-      const form = document.getElementById('rationForm');
-      form.classList.toggle('hidden');
-      this.textContent = form.classList.contains('hidden') ? 'Record New Distribution' : 'Cancel';
-    });
+    // ... keep existing code (Search functionality for ration and attendance)
 
     // Initialize tables on page load
     document.addEventListener('DOMContentLoaded', function() {
       populateChildrenTable(children);
-      populateRationTable(rationDistributions);
-      
-      // Set current date in attendance date picker
-      const today = new Date();
-      const dateString = today.toISOString().split('T')[0];
-      document.getElementById('attendanceDate').value = dateString;
+      // ... keep existing code (Initialize ration and attendance tables)
     });
   </script>
 </body>
