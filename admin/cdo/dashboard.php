@@ -10,7 +10,7 @@ redirectIfNotCDO();
 $action = isset($_GET['action']) ? $_GET['action'] : 'view';
 
 // Define valid actions
-$validActions = ['view', 'add', 'edit', 'delete', 'view_notifications', 'add_notification', 'edit_notification', 'delete_notification', 'view_worker', 'view_reports'];
+$validActions = ['view', 'add', 'edit', 'delete', 'view_notifications', 'add_notification', 'edit_notification', 'delete_notification', 'view_workers', 'view_issues', 'mark_issues', 'view_reports', 'mark_reports'];
 
 // Default to 'view' if the action is invalid
 if (!in_array($action, $validActions)) {
@@ -425,6 +425,174 @@ switch ($action) {
                                 exit();
                                 break;   
 
+                                case 'view_issues':
+                                    // Fetch the cdo_id of the logged-in CDO user
+                                    $stmt = $pdo->prepare("SELECT cdo_id FROM cdo WHERE user_id = ?");
+                                    $stmt->execute([$_SESSION['user_id']]);
+                                    $cdo = $stmt->fetch();
+                                
+                                    if (!$cdo) {
+                                        die("CDO not found.");
+                                    }
+                                
+                                    $cdo_id = $cdo['cdo_id'];
+                                
+                                    // Fetch all issues for this CDO
+                                    $stmt = $pdo->prepare("
+                                        SELECT si.*, s.name, s.town_village
+                                        FROM supervisor_issues AS si
+                                        JOIN supervisors AS s ON si.supervisor_id = s.supervisor_id
+                                        WHERE s.cdo_id = ?
+                                    ");
+                                    $stmt->execute([$cdo_id]);
+                                    $issues = $stmt->fetchAll();
+                                    break;
+                                
+                                    case 'mark_issues':
+                                        if (!isset($_GET['id'])) {
+                                            header('Location: dashboard.php?action=view_issues');
+                                            exit();
+                                        }
+                                        
+                                        $issue_id = $_GET['id'];
+                                        
+                                        // Fetch the supervisor issue details along with the associated supervisor's cdo_id
+                                        $stmt = $pdo->prepare("
+                                            SELECT si.*, s.cdo_id 
+                                            FROM supervisor_issues AS si 
+                                            JOIN supervisors AS s ON si.supervisor_id = s.supervisor_id 
+                                            WHERE si.issue_id = ?
+                                        ");
+                                        $stmt->execute([$issue_id]);
+                                        $issue = $stmt->fetch();
+                                        
+                                        if (!$issue) {
+                                            header('Location: dashboard.php?action=view_issues');
+                                            exit();
+                                        }
+                                        
+                                        // Fetch the cdo_id of the logged-in CDO user
+                                        $stmt = $pdo->prepare("SELECT cdo_id FROM cdo WHERE user_id = ?");
+                                        $stmt->execute([$_SESSION['user_id']]);
+                                        $cdo = $stmt->fetch();
+                                        
+                                        if (!$cdo) {
+                                            die("CDO not found.");
+                                        }
+                                        
+                                        $cdo_id = $cdo['cdo_id'];
+                                        
+                                        // Ensure the supervisor issue belongs to the logged-in CDO user
+                                        if ($issue['cdo_id'] !== $cdo_id) {
+                                            die("You do not have permission to mark this issue as viewed.");
+                                        }
+                                        
+                                        // Mark the supervisor issue as viewed
+                                        $stmt = $pdo->prepare("UPDATE supervisor_issues SET viewed = 1 WHERE issue_id = ?");
+                                        $stmt->execute([$issue_id]);
+                                        
+                                        // Redirect to the supervisor issues view page
+                                        header('Location: dashboard.php?action=view_issues');
+                                        exit();
+                                        break;
+
+                                        case 'view_reports':
+                                            // Fetch the cdo_id of the logged-in CDO user
+                                            $stmt = $pdo->prepare("SELECT cdo_id FROM cdo WHERE user_id = ?");
+                                            $stmt->execute([$_SESSION['user_id']]);
+                                            $cdo = $stmt->fetch();
+                                        
+                                            if (!$cdo) {
+                                                die("CDO not found.");
+                                            }
+                                        
+                                            $cdo_id = $cdo['cdo_id'];
+                                        
+                                            // Fetch all issues for this CDO
+                                            $stmt = $pdo->prepare("
+                                                SELECT r.*, s.name, s.town_village
+                                                FROM supervisorreports AS r
+                                                JOIN supervisors AS s ON r.supervisor_id = s.supervisor_id
+                                                WHERE s.cdo_id = ?
+                                            ");
+                                            $stmt->execute([$cdo_id]);
+                                            $reports = $stmt->fetchAll();
+                                            break;
+
+                                            case 'mark_reports':
+                                                if (!isset($_GET['id'])) {
+                                                    header('Location: dashboard.php?action=view_reports');
+                                                    exit();
+                                                }
+                                                
+                                                $report_id = $_GET['id'];
+                                                
+                                                // Fetch the supervisor issue details along with the associated supervisor's cdo_id
+                                                $stmt = $pdo->prepare("
+                                                    SELECT r.*, s.cdo_id 
+                                                    FROM supervisorreports AS r 
+                                                    JOIN supervisors AS s ON r.supervisor_id = s.supervisor_id 
+                                                    WHERE r.report_id = ?
+                                                ");
+                                                $stmt->execute([$report_id]);
+                                                $issue = $stmt->fetch();
+                                                
+                                                if (!$issue) {
+                                                    header('Location: dashboard.php?action=view_reports');
+                                                    exit();
+                                                }
+                                                
+                                                // Fetch the cdo_id of the logged-in CDO user
+                                                $stmt = $pdo->prepare("SELECT cdo_id FROM cdo WHERE user_id = ?");
+                                                $stmt->execute([$_SESSION['user_id']]);
+                                                $cdo = $stmt->fetch();
+                                                
+                                                if (!$cdo) {
+                                                    die("CDO not found.");
+                                                }
+                                                
+                                                $cdo_id = $cdo['cdo_id'];
+                                                
+                                                // Ensure the supervisor issue belongs to the logged-in CDO user
+                                                if ($issue['cdo_id'] !== $cdo_id) {
+                                                    die("You do not have permission to mark this report as verified.");
+                                                }
+                                                
+                                                // Mark the supervisor issue as viewed
+                                                $stmt = $pdo->prepare("UPDATE supervisorreports SET verified = 1 WHERE report_id = ?");
+                                                $stmt->execute([$report_id]);
+                                                
+                                                // Redirect to the supervisor issues view page
+                                                header('Location: dashboard.php?action=view_reports');
+                                                exit();
+                                                break;    
+
+                                                case 'view_workers':
+                                                    // Fetch the cdo_id of the logged-in CDO user
+                                                    $stmt = $pdo->prepare("SELECT cdo_id FROM cdo WHERE user_id = ?");
+                                                    $stmt->execute([$_SESSION['user_id']]);
+                                                    $cdo = $stmt->fetch();
+                                                
+                                                    if (!$cdo) {
+                                                        die("CDO not found.");
+                                                    }
+                                                
+                                                    $cdo_id = $cdo['cdo_id'];
+                                                
+                                                    // Fetch all workers associated with centres created by supervisors belonging to this CDO.
+                                                    $stmt = $pdo->prepare("
+                                                        SELECT w.*
+                                                        FROM workers AS w
+                                                        JOIN anganwadicentres AS c ON w.centre_id = c.centre_id
+                                                        JOIN supervisors AS s ON c.supervisor_id = s.supervisor_id
+                                                        WHERE s.cdo_id = ?
+                                                    ");
+                                                    $stmt->execute([$cdo_id]);
+                                                    $workers = $stmt->fetchAll();
+                                                    break;
+                                                
+                                                    
+
     case 'view':
     default:
         // Fetch the cdo_id of the logged-in CDO user
@@ -479,7 +647,8 @@ function uploadFile($file, $uploadDir) {
                         'govt-orange': '#ff9933',
                         'govt-green': '#138808',
                         'govt-text-gray': '#4a5568',
-                        'govt-red': '#e3342f'
+                        'govt-red': '#e3342f',
+                        'govt-light-red': '#f7d4d6'
                     }
                 }
             }
@@ -575,7 +744,7 @@ function uploadFile($file, $uploadDir) {
             </a>
 
             <!-- Workers Card -->
-            <a href="workers/view.php" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-govt-green">
+            <a href="?action=view_workers" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-govt-green">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-green-100 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-govt-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -590,7 +759,7 @@ function uploadFile($file, $uploadDir) {
             </a>
 
             <!-- Reports Card -->
-            <a href="reports/view.php" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-govt-orange">
+            <a href="?action=view_reports" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-govt-orange">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-orange-100 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-govt-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -599,22 +768,43 @@ function uploadFile($file, $uploadDir) {
                     </div>
                     <div>
                         <h2 class="text-xl font-semibold text-govt-orange">Reports</h2>
-                        <p class="text-gray-600">View and generate reports</p>
+                        <p class="text-gray-600">View and address the reports of Supervisor</p>
                     </div>
                 </div>
             </a>
             <!-- Notifications Card -->
-            <a href="?action=view_notifications" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-red">
+            <a href="?action=view_notifications" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-yellow-500">
     <!-- Default Content (Notifications Info) -->
                 <div id="notification-content" class="flex items-center gap-4">
-                    <div class="p-3 bg-red-100 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-govt-red h-8 w-8">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-600 h-8 w-8">
                             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29c-.63.63-.19 1.71.7 1.71h13.17c.89 0 1.34-1.08.71-1.71L18 16z"></path>
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-semibold text-govt-red">Notifications</h2>
+                        <h2 class="text-xl font-semibold text-yellow-500">Notifications</h2>
                         <p class="text-gray-600">View and add notifications for supervisor/worker</p>
+                    </div>
+                </div>
+
+            </a>
+            <!-- Issues Card -->
+            <a href="?action=view_issues" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-red">
+    <!-- Default Content (Notifications Info) -->
+                <div id="notification-content" class="flex items-center gap-4">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 100 100" viewBox="0 0 100 100" id="attention" fill="currentColor" class="text-govt-red h-8 w-8" stroke-width="2">
+                            <path d="M91.36,78.98L55.22,15.11c-1.08-1.91-3.03-3.05-5.22-3.05l0,0c-2.19,0-4.14,1.14-5.22,3.05L8.64,78.98
+                                    c-1.06,1.88-1.05,4.11,0.04,5.98c1.09,1.86,3.02,2.98,5.18,2.98h72.28c2.16,0,4.1-1.11,5.18-2.98
+                                    C92.41,83.1,92.43,80.86,91.36,78.98z M87.87,82.95c-0.17,0.3-0.69,0.99-1.73,0.99H13.86c-1.04,0-1.55-0.69-1.73-0.99
+                                    c-0.17-0.3-0.52-1.09-0.01-1.99l36.14-63.88c0.52-0.92,1.39-1.02,1.74-1.02c0.35,0,1.22,0.1,1.74,1.02l36.14,63.88
+                                    C88.39,81.86,88.04,82.65,87.87,82.95z"></path>
+                            <path d="M50 63.94c-3.86 0-7 3.14-7 7s3.14 7 7 7 7-3.14 7-7S53.86 63.94 50 63.94zM50 73.94c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3S51.65 73.94 50 73.94zM50 31.94c-3.86 0-7 3.14-7 7v14c0 3.86 3.14 7 7 7s7-3.14 7-7v-14C57 35.08 53.86 31.94 50 31.94zM53 52.94c0 1.65-1.35 3-3 3s-3-1.35-3-3v-14c0-1.65 1.35-3 3-3s3 1.35 3 3V52.94z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-govt-red">Issues</h2>
+                        <p class="text-gray-600">View and address the issues of Supervisor</p>
                     </div>
                 </div>
 
@@ -861,6 +1051,156 @@ function uploadFile($file, $uploadDir) {
         </div>
         <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Update Notification</button>
     </form>
+<?php endif; ?>
+
+<?php if ($action === 'view_issues'): ?>
+    <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Issues</h1>
+    </div>
+
+    
+    <div class="bg-white rounded-lg shadow-md overflow-x-scroll md:overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supervisor Name</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Town/Village</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Messages</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($issues as $issues): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['name']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['town_village']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_type']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_message']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['created_at']); ?></td>
+                        <td class="px-6 py-4">
+                            <?php if ($issues['viewed'] == 0): ?>
+                                <a href="?action=mark_issues&id=<?php echo $issues['issue_id']; ?>" class="text-red-500 hover:text-red-400">Mark as Read</a>
+                            <?php else: ?>
+                                <span class="text-green-600 font-semibold">Viewed</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php endif; ?>
+
+<?php if ($action === 'view_reports'): ?>
+    <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Reports</h1>
+    </div>
+
+    
+    <div class="bg-white rounded-lg shadow-md overflow-x-scroll md:overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supervisor Name</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Town/Village</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Message</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File Uploaded</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($reports as $reports): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['report_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['name']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['town_village']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['report_text']); ?></td>
+                        <td class="px-6 py-4">
+                            <!-- fix URL in while hosting -->
+                            <?php if (!empty($reports['file_path'])): ?>
+                                <a href="<?php echo htmlspecialchars('/anganwadi_management/admin' . $reports['file_path']); ?>" target="_blank" class="text-blue-500 hover:text-blue-700">View PDF</a>
+                            <?php else: ?>
+                                <span class="text-gray-400">No File</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['created_at']); ?></td>
+                        <td class="px-6 py-4">
+                            <?php if ($reports['verified'] == 0): ?>
+                                <a href="?action=mark_reports&id=<?php echo $reports['report_id']; ?>" class="text-red-500 hover:text-red-400">Mark as Verified</a>
+                            <?php else: ?>
+                                <span class="text-green-600 font-semibold">Verified</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php endif; ?>
+<?php if ($action === 'view_workers'): ?>
+    <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Workers</h1>
+    </div>
+
+    
+    <div class="bg-white rounded-lg shadow-md overflow-x-scroll">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Emergency Contact</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aadhar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Proof Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Proof File</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qualification</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qualification File</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account Created On</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($workers as $workers): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['worker_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['name']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['gender']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['email']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['contact_number']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['emergency_contact']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['aadhar']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['id_type']); ?></td>
+                        <td class="px-6 py-4">
+                            <!-- fix URL in while hosting -->
+                            <?php if (!empty($workers['id_path'])): ?>
+                                <a href="<?php echo htmlspecialchars('/anganwadi_management/admin' . $workers['id_path']); ?>" target="_blank" class="text-blue-500 hover:text-blue-700">View PDF</a>
+                            <?php else: ?>
+                                <span class="text-gray-400">No File</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['qualification_type']); ?></td>
+                        <td class="px-6 py-4">
+                            <!-- fix URL in while hosting -->
+                            <?php if (!empty($workers['qualification_path'])): ?>
+                                <a href="<?php echo htmlspecialchars('/anganwadi_management/admin' . $workers['qualification_path']); ?>" target="_blank" class="text-blue-500 hover:text-blue-700">View PDF</a>
+                            <?php else: ?>
+                                <span class="text-gray-400">No File</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['created_at']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>
     </main>
             
