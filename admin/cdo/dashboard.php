@@ -581,7 +581,7 @@ switch ($action) {
                                                 
                                                     // Fetch all workers associated with centres created by supervisors belonging to this CDO.
                                                     $stmt = $pdo->prepare("
-                                                        SELECT w.*
+                                                        SELECT w.*, c.centre_name
                                                         FROM workers AS w
                                                         JOIN anganwadicentres AS c ON w.centre_id = c.centre_id
                                                         JOIN supervisors AS s ON c.supervisor_id = s.supervisor_id
@@ -1155,6 +1155,7 @@ function uploadFile($file, $uploadDir) {
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anganwadi Name</th>                    
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>                    
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>                    
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
@@ -1172,6 +1173,7 @@ function uploadFile($file, $uploadDir) {
                     <tr>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($workers['worker_id']); ?></td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($workers['name']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($workers['centre_name']); ?></td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($workers['gender']); ?></td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($workers['email']); ?></td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($workers['contact_number']); ?></td>
