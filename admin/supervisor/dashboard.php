@@ -6,7 +6,7 @@ redirectIfNotSupervisor();
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'view';
 
-$validActions = ['add_workers', 'edit_workers', 'delete_workers', 'view_workers', 'add_centres', 'edit_centres', 'delete_centres', 'view_centres', 'view_notifications', 'raise_issue', 'view_issues', 'log_visits', 'view_visits'];
+$validActions = ['add_workers', 'edit_workers', 'delete_workers', 'view_workers', 'add_centres', 'edit_centres', 'delete_centres', 'view_centres', 'view_notifications', 'raise_issues', 'view_issues', 'edit_issues', 'delete_issues','add_reports','view_reports','edit_reports','delete_reports', 'log_visits', 'view_visits'];
 
 if (!in_array($action, $validActions)) {
     $action = 'view_workers';
@@ -35,7 +35,7 @@ switch ($action) {
         $stmt->execute([$supervisor_id]);
         $workers = $stmt->fetchAll();
         break;
-        case 'add_workers':
+    case 'add_workers':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = sanitizeInput($_POST['name']);
                 $username = sanitizeInput($_POST['username']);
@@ -300,6 +300,301 @@ switch ($action) {
         exit();
         break;   
 
+    case 'view_notifications':
+        // Fetch the supervisor_id of the logged-in supervisor
+        $stmt = $pdo->prepare("SELECT supervisor_id, cdo_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+    
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+    
+        $supervisor_id = $supervisor['supervisor_id'];
+        $cdo_id = $supervisor['cdo_id'];
+        // Fetch all notifications raised by the CDO of this supervisor
+        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE cdo_id = ?");
+        $stmt->execute([$cdo_id]);
+        $notifications = $stmt->fetchAll();
+        break;
+    
+    case 'raise_issues':
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+        
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+    
+        $supervisor_id = $supervisor['supervisor_id'];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $issue_type = sanitizeInput($_POST['issue_type']);
+            $issue_message = sanitizeInput($_POST['issue_message']);
+            // Insert into issues table
+            $stmt = $pdo->prepare("INSERT INTO supervisor_issues (supervisor_id, issue_type, issue_message) VALUES (?, ?, ?)");
+            $stmt->execute([$supervisor_id, $issue_type, $issue_message]);
+    
+            // Redirect to view page
+            header('Location: dashboard.php?action=view_issues');
+            exit();
+        }
+        break;
+    
+    case 'view_issues':    
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+        $supervisor_id = $supervisor['supervisor_id'];
+        // Fetch all issues raised by the supervisor
+        $stmt = $pdo->prepare("SELECT * FROM supervisor_issues WHERE supervisor_id = ?");
+        $stmt->execute([$supervisor_id]);
+        $issues = $stmt->fetchAll();
+        break;
+
+    case 'edit_issues':
+        if (!isset($_GET['id'])) {
+            header('Location: dashboard.php?action=view_issues');
+            exit();
+        }
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+        $issue_id = $_GET['id'];
+        // Fetch issue details
+        $stmt = $pdo->prepare("SELECT * FROM supervisor_issues WHERE issue_id = ? AND supervisor_id = ?");
+        $stmt->execute([$issue_id, $supervisor['supervisor_id']]);
+        $issue = $stmt->fetch();
+        
+        if (!$issue) {
+            header('Location: dashboard.php?action=view_issues');
+            exit();
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $issue_type = sanitizeInput($_POST['issue_type']);
+            $issue_message = sanitizeInput($_POST['issue_message']);
+        
+            $stmt = $pdo->prepare("UPDATE supervisor_issues SET issue_type = ?, issue_message = ? WHERE issue_id = ?");
+            $stmt->execute([$issue_type, $issue_message, $issue_id]);
+        
+            header('Location: dashboard.php?action=view_issues');
+            exit();
+        }
+        break;
+
+    case 'delete_issues':
+        if (!isset($_GET['id'])) {
+            header('Location: dashboard.php?action=view_issues');
+            exit();
+        }
+        
+        $issue_id = $_GET['id'];
+        
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+        
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+        
+        // Delete the issue
+        $stmt = $pdo->prepare("DELETE FROM supervisor_issues WHERE issue_id = ? AND supervisor_id = ?");
+        $stmt->execute([$issue_id, $supervisor['supervisor_id']]);
+        
+        header('Location: dashboard.php?action=view_issues');
+        exit();
+        break;
+
+        case 'add_reports':
+            // Check if the form is submitted
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Validate and sanitize inputs
+                $report_text = sanitizeInput($_POST['report_text']);
+        
+                // Handle file upload
+                if (isset($_FILES['report_file']) && $_FILES['report_file']['error'] === UPLOAD_ERR_OK) {
+                    $upload_dir ='../uploads/supervisor_reports/'; // Absolute path to the uploads directory
+                    $file_name = uniqid() . '_' . basename($_FILES['report_file']['name']); // Unique file name
+                    $file_path = $upload_dir . $file_name; // Full path to save the file
+        
+                    // Ensure the uploads directory exists
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true); // Create the directory if it doesn't exist
+                    }
+        
+                    // Move the uploaded file to the target directory
+                    if (move_uploaded_file($_FILES['report_file']['tmp_name'], $file_path)) {
+                        // File uploaded successfully
+                        $file_path = '/uploads/supervisor_reports/' . $file_name; // Relative path for database
+                    } else {
+                        die("Failed to upload file.");
+                    }
+                } else {
+                    die("No file uploaded or file upload error.");
+                }
+        
+                // Fetch supervisor ID
+                $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $supervisor = $stmt->fetch();
+        
+                if (!$supervisor) {
+                    die("Supervisor not found.");
+                }
+        
+                $supervisor_id = $supervisor['supervisor_id'];
+        
+                // Insert report into the database
+                $stmt = $pdo->prepare("INSERT INTO supervisorreports (supervisor_id, report_text, file_path) VALUES (?, ?, ?)");
+                $stmt->execute([$supervisor_id, $report_text, $file_path]);
+        
+                // Redirect to view reports page
+                header('Location: dashboard.php?action=view_reports');
+                exit();
+            }
+            break;
+    
+    case 'view_reports':
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+        $supervisor_id = $supervisor['supervisor_id'];
+        // Fetch all reports raised by the supervisor
+        $stmt = $pdo->prepare("SELECT * FROM supervisorreports WHERE supervisor_id = ?");
+        $stmt->execute([$supervisor_id]);
+        $reports = $stmt->fetchAll();
+        break;
+    
+        case 'edit_reports':
+            // Check if the report ID is provided
+            if (!isset($_GET['id'])) {
+                header('Location: dashboard.php?action=view_reports');
+                exit();
+            }
+        
+            $report_id = $_GET['id'];
+        
+            // Fetch the supervisor ID of the currently logged-in user
+            $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $supervisor = $stmt->fetch();
+        
+            if (!$supervisor) {
+                die("Supervisor not found.");
+            }
+        
+            $supervisor_id = $supervisor['supervisor_id'];
+        
+            // Fetch the existing report details and verify supervisor_id
+            $stmt = $pdo->prepare("SELECT * FROM supervisorreports WHERE report_id = ? AND supervisor_id = ?");
+            $stmt->execute([$report_id, $supervisor_id]);
+            $report = $stmt->fetch();
+        
+            if (!$report) {
+                die("Report not found or you do not have permission to edit this report.");
+            }
+        
+            // Check if the form is submitted
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Validate and sanitize inputs
+                $report_text = sanitizeInput($_POST['report_text']);
+        
+                // Handle file upload (if a new file is uploaded)
+                $file_path = $report['file_path']; // Keep the existing file path by default
+                if (isset($_FILES['report_file']) && $_FILES['report_file']['error'] === UPLOAD_ERR_OK) {
+                    // Define the upload directory
+                    $upload_dir = '../uploads/supervisor_reports/';
+        
+                    // Generate a unique file name using uniqid()
+                    $file_name = uniqid() . '_' . basename($_FILES['report_file']['name']);
+                    $new_file_path = $upload_dir . $file_name;
+        
+                    // Ensure the uploads directory exists
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+        
+                    // Move the uploaded file to the target directory
+                    if (move_uploaded_file($_FILES['report_file']['tmp_name'], $new_file_path)) {
+                        // Delete the old file if it exists
+                        if (file_exists(__DIR__ . '/' . $report['file_path'])) {
+                            unlink(__DIR__ . '/' . $report['file_path']);
+                        }
+        
+                        // Update the file path for the database
+                        $file_path = '/uploads/supervisor_reports/' . $file_name;
+                    } else {
+                        die("Failed to upload file.");
+                    }
+                }
+        
+                // Update the report in the database
+                $stmt = $pdo->prepare("UPDATE supervisorreports SET report_text = ?, file_path = ? WHERE report_id = ? AND supervisor_id = ?");
+                $stmt->execute([$report_text, $file_path, $report_id, $supervisor_id]);
+        
+                // Redirect to view reports page
+                header('Location: dashboard.php?action=view_reports');
+                exit();
+            }
+            break;        
+
+            case 'delete_reports':
+                // Check if the report ID is provided
+                if (!isset($_GET['id'])) {
+                    header('Location: dashboard.php?action=view_reports');
+                    exit();
+                }
+            
+                $report_id = $_GET['id'];
+            
+                // Fetch the supervisor ID of the currently logged-in user
+                $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $supervisor = $stmt->fetch();
+            
+                if (!$supervisor) {
+                    die("Supervisor not found.");
+                }
+            
+                $supervisor_id = $supervisor['supervisor_id'];
+            
+                // Fetch the report details and verify supervisor_id (to ensure the report belongs to the supervisor)
+                $stmt = $pdo->prepare("SELECT * FROM supervisorreports WHERE report_id = ? AND supervisor_id = ?");
+                $stmt->execute([$report_id, $supervisor_id]);
+                $report = $stmt->fetch();
+            
+                if (!$report) {
+                    die("Report not found or you do not have permission to delete this report.");
+                }
+            
+                // Delete the associated file (if it exists)
+                if (!empty($report['file_path']) && file_exists(__DIR__ . '/' . $report['file_path'])) {
+                    unlink(__DIR__ . '/' . $report['file_path']); // Delete the file
+                }
+            
+                // Delete the report from the database
+                $stmt = $pdo->prepare("DELETE FROM supervisorreports WHERE report_id = ?");
+                $stmt->execute([$report_id]);
+            
+                // Redirect to view reports page
+                header('Location: dashboard.php?action=view_reports');
+                exit();
+                break;
     default:
         $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
         $stmt->execute([$_SESSION['user_id']]);
@@ -431,7 +726,7 @@ function uploadFile($file, $uploadDir) {
 </header>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8">
+    <div class="flex-grow container mx-auto px-4 py-8">
         <!-- Dashboard Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Workers Card -->
@@ -465,9 +760,9 @@ function uploadFile($file, $uploadDir) {
             </a>
 
             <!-- Notifications Card -->
-            <div id="notification-card" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-red">
+            <a id="notification-card" href="?action=view_notifications"  class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-red">
                 <!-- Default Content (Notifications Info) -->
-                <div id="notification-content" class="flex items-center gap-4">
+                <div class="flex items-center gap-4">
                     <div class="p-3 bg-red-100 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-govt-red h-8 w-8">
                             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29c-.63.63-.19 1.71.7 1.71h13.17c.89 0 1.34-1.08.71-1.71L18 16z"></path>
@@ -475,18 +770,47 @@ function uploadFile($file, $uploadDir) {
                     </div>
                     <div>
                         <h2 class="text-xl font-semibold text-govt-red">Notifications</h2>
-                        <p class="text-gray-600">View and add notifications for supervisor/worker</p>
+                        <p class="text-gray-600">View the notifications given by your CDO</p>
                     </div>
                 </div>
+            </a>
+            <!-- paste below -->
+            <!-- Reports Card -->
+<a href="?action=view_reports" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-govt-orange">
+    <div class="flex items-center gap-4">
+        <div class="p-3 bg-orange-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-govt-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold text-govt-orange">Reports</h2>
+            <p class="text-gray-600">View and address the reports of Supervisor</p>
+        </div>
+    </div>
+</a>
 
-                <!-- Buttons (Hidden by Default) -->
-                <div id="notification-buttons" class="hidden flex flex-col gap-4 mt-4">
-                    <a href="?action=add_notification" class="bg-blue-500 text-white px-4 py-2 rounded-md text-center hover:bg-blue-600">Add</a>
-                    <a href="?action=edit_notification" class="bg-yellow-500 text-white px-4 py-2 rounded-md text-center hover:bg-yellow-600">Edit</a>
-                    <a href="?action=view_notifications" class="bg-green-500 text-white px-4 py-2 rounded-md text-center hover:bg-green-600">View</a>
-                    <a href="?action=delete_notification" class="bg-red-500 text-white px-4 py-2 rounded-md text-center hover:bg-red-600">Delete</a>
-                </div>
-            </div>
+<!-- Issues Card -->
+<a href="?action=view_issues" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-red">
+    <div id="notification-content" class="flex items-center gap-4">
+        <div class="p-3 bg-red-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 100 100" viewBox="0 0 100 100" id="attention" fill="currentColor" class="text-govt-red h-8 w-8" stroke-width="2">
+                <path d="M91.36,78.98L55.22,15.11c-1.08-1.91-3.03-3.05-5.22-3.05l0,0c-2.19,0-4.14,1.14-5.22,3.05L8.64,78.98
+                        c-1.06,1.88-1.05,4.11,0.04,5.98c1.09,1.86,3.02,2.98,5.18,2.98h72.28c2.16,0,4.1-1.11,5.18-2.98
+                        C92.41,83.1,92.43,80.86,91.36,78.98z M87.87,82.95c-0.17,0.3-0.69,0.99-1.73,0.99H13.86c-1.04,0-1.55-0.69-1.73-0.99
+                        c-0.17-0.3-0.52-1.09-0.01-1.99l36.14-63.88c0.52-0.92,1.39-1.02,1.74-1.02c0.35,0,1.22,0.1,1.74,1.02l36.14,63.88
+                        C88.39,81.86,88.04,82.65,87.87,82.95z"></path>
+                <path d="M50 63.94c-3.86 0-7 3.14-7 7s3.14 7 7 7 7-3.14 7-7S53.86 63.94 50 63.94zM50 73.94c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3S51.65 73.94 50 73.94zM50 31.94c-3.86 0-7 3.14-7 7v14c0 3.86 3.14 7 7 7s7-3.14 7-7v-14C57 35.08 53.86 31.94 50 31.94zM53 52.94c0 1.65-1.35 3-3 3s-3-1.35-3-3v-14c0-1.65 1.35-3 3-3s3 1.35 3 3V52.94z"></path>
+            </svg>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold text-govt-red">Issues</h2>
+            <p class="text-gray-600">View and address the issues of Supervisor</p>
+        </div>
+    </div>
+</a>
+
+
         </div>
 
         <?php if ($action === 'view_workers'): ?>
@@ -760,8 +1084,8 @@ function uploadFile($file, $uploadDir) {
         </form>     
        
         <?php elseif ($action === 'edit_centres'): ?>
-            <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Edit Centres</h1>
-            <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Edit Centres</h1>
+        <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
             <div class="mb-4">
                 <label for="centre_name" class="block text-sm font-medium text-gray-700">Centre Name</label>
                 <input type="text" name="centre_name" id="centre_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" value="<?php echo htmlspecialchars($centre['centre_name']); ?>" required>
@@ -776,7 +1100,194 @@ function uploadFile($file, $uploadDir) {
             </div>
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Update Centre</button>
         </form>        
+       <?php elseif ($action === 'view_notifications'): ?>
+        <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Notifications</h1>
+        </div>
 
+    
+    <div class="bg-white rounded-lg shadow-md md:overflow-hidden overflow-x-scroll">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notification Id</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recipient Type</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Message</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($notifications as $notifications): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($notifications['notification_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($notifications['title']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($notifications['recipient_type']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($notifications['message']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($notifications['created_at']); ?></td>
+                    </tr>   
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <?php elseif ($action === 'raise_issues'): ?>
+    <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Raise an Issue</h1>
+    <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-4">
+            <label for="issue_type" class="block text-sm font-medium text-gray-700">Issue Related To</label>
+            <select name="issue_type" id="issue_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+                <option value="children">Children</option>
+                <option value="ration">Ration</option>
+                <option value="worker">Worker</option>
+                <option value="anganwadi">Anganwadi</option>
+                <option value="other">other</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="issue_message" class="block text-sm font-medium text-gray-700">Describe the Issue</la>
+            <textarea name="issue_message" id="issue_message" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required></textarea>
+        </div>
+        <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-400">Raise Issue</button>
+    </form>
+    <?php elseif ($action === 'view_issues'): ?>
+    <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Issues</h1>
+        <a href="?action=raise_issues" class="bg-govt-blue text-white px-4 py-2 rounded-md text-center hover:bg-blue-600 mb-4 "> + Raise an Issue</a>           
+    </div>
+    <div class="bg-white rounded-lg shadow-md md:overflow-hidden overflow-x-scroll">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Id</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Type</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Message</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Viewed</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted On</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($issues as $issues): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_type']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['issue_message']); ?></td>
+                        <?php if ($issues['viewed'] == 0): ?>
+                                <td class="px-6 py-4 text-govt-orange">Pending</td>
+                            <?php else: ?>
+                                <td class="px-6 py-4 text-govt-green">Viewed</td>
+                            <?php endif; ?>                        
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($issues['created_at']); ?></td>
+                        <td class="px-6 py-4">
+                            <a href="?action=edit_issues&id=<?php echo $issues['issue_id']; ?>" class="text-blue-500 hover:text-blue-700">Edit</a>
+                            <a href="?action=delete_issues&id=<?php echo $issues['issue_id']; ?>" onclick="return confirmIssueDelete();" class="text-red-500 hover:text-red-700 ml-2">Delete</a>
+                        </td>            
+                    </tr>   
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php elseif ($action === 'edit_issues'): ?>
+        <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Edit an Issue</h1>
+        <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="issue_type" class="block text-sm font-medium text-gray-700">Issue Related To</label>
+                <select name="issue_type" id="issue_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+                    <option value="children" <?php echo ($issue['issue_type'] === 'children') ? 'selected' : ''; ?>>Children</option>
+                    <option value="ration" <?php echo ($issue['issue_type'] === 'ration') ? 'selected' : ''; ?>>Ration</option>
+                    <option value="worker" <?php echo ($issue['issue_type'] === 'worker') ? 'selected' : ''; ?>>Worker</option>
+                    <option value="anganwadi" <?php echo ($issue['issue_type'] === 'anganwadi') ? 'selected' : ''; ?>>Anganwadi</option>
+                    <option value="other" <?php echo ($issue['issue_type'] === 'other') ? 'selected' : ''; ?>>Other</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="issue_message" class="block text-sm font-medium text-gray-700">Describe the Issue</label>
+                <textarea name="issue_message" id="issue_message" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required><?php echo htmlspecialchars($issue['issue_message']); ?></textarea>
+            </div>
+            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-400">Update Issue</button>
+        </form>
+    <?php elseif ($action === 'view_reports'): ?>
+        <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Reports</h1>
+        <a href="?action=add_reports" class="bg-govt-blue text-white px-4 py-2 rounded-md text-center hover:bg-blue-600 mb-4 "> + Add Reports</a>           
+    </div>
+    <div class="bg-white rounded-lg shadow-md md:overflow-hidden overflow-x-scroll">
+        <table class="min-w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Id</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Description</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report File</th>                    
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted On</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Viewed</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($reports as $reports): ?>
+                    <tr>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['report_id']); ?></td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['report_text']); ?></td>
+                        <td class="px-6 py-4">
+                            <!-- fix URL in while hosting -->
+                            <?php if (!empty($reports['file_path'])): ?>
+                                <a href="<?php echo htmlspecialchars('/anganwadi_management/admin' . $reports['file_path']); ?>" target="_blank" class="text-blue-500 hover:text-blue-700">View PDF</a>
+                            <?php else: ?>
+                                <span class="text-gray-400">No File</span>
+                            <?php endif; ?>
+                        </td>
+                        <?php if ($reports['verified'] == 0): ?>
+                                <td class="px-6 py-4 text-govt-orange">Pending</td>
+                            <?php else: ?>
+                                <td class="px-6 py-4 text-govt-green">Verified</td>
+                            <?php endif; ?>                        
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($reports['created_at']); ?></td>
+                        <td class="px-6 py-4">
+                            <a href="?action=edit_reports&id=<?php echo $reports['report_id']; ?>" class="text-blue-500 hover:text-blue-700">Edit</a>
+                            <a href="?action=delete_reports&id=<?php echo $reports['report_id']; ?>" onclick="return confirmIssueDelete();" class="text-red-500 hover:text-red-700 ml-2">Delete</a>
+                        </td>            
+                    </tr>   
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php elseif ($action === 'add_reports'): ?>
+        <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Add Report</h1>
+        <form method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+            <!-- Report Text -->
+            <div class="mb-4">
+                <label for="report_text" class="block text-sm font-medium text-gray-700">Report Text</label>
+                <textarea name="report_text" id="report_text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required></textarea>
+            </div>
+
+            <!-- File Upload -->
+            <div class="mb-4">
+                <label for="report_file" class="block text-sm font-medium text-gray-700">Upload File</label>
+                <input type="file" name="report_file" id="report_file" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-400">Submit Report</button>
+        </form>    
+    <?php elseif ($action === 'edit_reports'): ?>
+        <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Edit Report</h1>
+        <form method="POST" action="dashboard.php?action=edit_reports&id=<?php echo $report['report_id']; ?>" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+            <!-- Report Text -->
+            <div class="mb-4">
+                <label for="report_text" class="block text-sm font-medium text-gray-700">Report Text</label>
+                <textarea name="report_text" id="report_text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required><?php echo htmlspecialchars($report['report_text']); ?></textarea>
+            </div>
+
+            <!-- File Upload -->
+            <div class="mb-4">
+                <label for="report_file" class="block text-sm font-medium text-gray-700">Upload New File (Optional)</label>
+                <input type="file" name="report_file" id="report_file" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                <p class="text-sm text-gray-500 mt-2">Current file: <a href="/anganwadi_management/admin/<?php echo $report['file_path']; ?>" target="_blank" class="text-blue-500"><?php echo basename($report['file_path']); ?></a></p>            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-400">Update Report</button>
+        </form>
     </main>
     <?php endif; ?>                      
 
@@ -839,6 +1350,9 @@ function uploadFile($file, $uploadDir) {
     }
     function confirmWorkerDelete() {
         return confirm("Are you sure you want to delete this Worker?");
+    }
+    function confirmIssueDelete() {
+        return confirm("Are you sure you want to delete this Issue?");
     }
     </script>
     <script>
