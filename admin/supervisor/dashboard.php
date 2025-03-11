@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require '../includes/auth.php';
 require '../includes/db.php';
 require '../includes/functions.php';
@@ -6,7 +9,7 @@ redirectIfNotSupervisor();
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'view';
 
-$validActions = ['add_workers', 'edit_workers', 'delete_workers', 'view_workers', 'add_centres', 'edit_centres', 'delete_centres', 'view_centres', 'view_notifications', 'raise_issues', 'view_issues', 'edit_issues', 'delete_issues','add_reports','view_reports','edit_reports','delete_reports', 'log_visits', 'view_visits'];
+$validActions = ['add_workers', 'edit_workers', 'delete_workers', 'view_workers', 'add_centres', 'edit_centres', 'delete_centres', 'view_centres', 'view_notifications', 'raise_issues', 'view_issues', 'edit_issues', 'delete_issues','add_reports','view_reports','edit_reports','delete_reports', 'log_visit', 'view_visit'];
 
 if (!in_array($action, $validActions)) {
     $action = 'view_workers';
@@ -595,6 +598,75 @@ switch ($action) {
                 header('Location: dashboard.php?action=view_reports');
                 exit();
                 break;
+
+                case 'log_visit':
+                    // Fetch the supervisor_id of the logged-in supervisor
+                    $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $supervisor = $stmt->fetch();
+                    
+                    if (!$supervisor) {
+                        die("Supervisor not found.");
+                    }
+                    
+                    $supervisor_id = $supervisor['supervisor_id'];
+                
+                    // Fetch the supervisor's assigned centres
+                    $stmt = $pdo->prepare("SELECT centre_id, centre_name FROM anganwadicentres WHERE supervisor_id = ?");
+                    $stmt->execute([$supervisor_id]);
+                    $centres = $stmt->fetchAll();
+                
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        // Sanitize and validate inputs
+                        $visit_date = sanitizeInput($_POST['visit_date']);
+                        $visit_time = sanitizeInput($_POST['visit_time']);
+                        $notes = sanitizeInput($_POST['notes']);
+                        $centre_id = sanitizeInput($_POST['centre_id']);
+                
+                        // Validate that the selected centre belongs to the supervisor
+                        $valid_centre = false;
+                        foreach ($centres as $centre) {
+                            if ($centre['centre_id'] == $centre_id) {
+                                $valid_centre = true;
+                                break;
+                            }
+                        }
+                
+                        if (!$valid_centre) {
+                            die("Invalid centre selected.");
+                        }
+                
+                        // Insert into visits table
+                        try {
+                            $stmt = $pdo->prepare("INSERT INTO visits (supervisor_id, visit_date, visit_time, notes, centre_id) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->execute([$supervisor_id, $visit_date, $visit_time, $notes, $centre_id]);
+                
+                            // Redirect to view visits page
+                            header('Location: dashboard.php?action=view_visit');
+                            exit();
+                        } catch (PDOException $e) {
+                            die("Error logging visit: " . $e->getMessage());
+                        }
+                    }
+                    break;
+    
+    case 'view_visit':
+        // Fetch the supervisor_id of the logged-in supervisor
+        $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $supervisor = $stmt->fetch();
+        
+        if (!$supervisor) {
+            die("Supervisor not found.");
+        }
+        
+        $supervisor_id = $supervisor['supervisor_id'];
+        
+        // Fetch all visits made by the supervisor
+        $stmt = $pdo->prepare("SELECT v.*, c.centre_name FROM visits AS v JOIN anganwadicentres AS c ON v.centre_id = c.centre_id WHERE v.supervisor_id = ?");
+        $stmt->execute([$supervisor_id]);
+        $visits = $stmt->fetchAll();
+        break;    
     default:
         $stmt = $pdo->prepare("SELECT supervisor_id FROM supervisors WHERE user_id = ?");
         $stmt->execute([$_SESSION['user_id']]);
@@ -810,6 +882,20 @@ function uploadFile($file, $uploadDir) {
     </div>
 </a>
 
+<!-- Log Visit Card -->
+<a href="?action=view_visit" class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-govt-blue">
+    <div id="log-visit-content" class="flex items-center gap-4">
+        <div class="p-3 bg-blue-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-govt-blue h-8 w-8" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path>
+            </svg>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold text-govt-blue">Log Visit</h2>
+            <p class="text-gray-600">Record and track supervisor visits</p>
+        </div>
+    </div>
+</a>
 
         </div>
 
@@ -1049,7 +1135,7 @@ function uploadFile($file, $uploadDir) {
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                <?php foreach ($centres as $centres): ?>
+                <?php foreach ($centres as $centre): ?>
                     <tr>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($centres['centre_id']); ?></td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($centres['centre_name']); ?></td>
@@ -1288,6 +1374,76 @@ function uploadFile($file, $uploadDir) {
             <!-- Submit Button -->
             <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-400">Update Report</button>
         </form>
+    <?php elseif ($action === 'log_visit'): ?>
+        <h1 class="text-3xl font-bold text-govt-blue mb-6 mt-4">Log a Visit</h1>
+<form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+    <!-- Visit Date -->
+    <div class="mb-4">
+        <label for="visit_date" class="block text-sm font-medium text-gray-700">Visit Date</label>
+        <input type="date" name="visit_date" id="visit_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+    </div>
+
+    <!-- Visit Time -->
+    <div class="mb-4">
+        <label for="visit_time" class="block text-sm font-medium text-gray-700">Visit Time</label>
+        <input type="time" name="visit_time" id="visit_time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+    </div>
+
+    <!-- Notes -->
+    <div class="mb-4">
+        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+        <textarea name="notes" id="notes" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" rows="4" placeholder="Enter visit notes..."></textarea>
+    </div>
+
+    <!-- Centre Selection -->
+    <div class="mb-4">
+        <label for="centre_id" class="block text-sm font-medium text-gray-700">Select Centre</label>
+        <select name="centre_id" id="centre_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            <option value="">Select a Centre</option>        
+            <?php foreach ($centres as $centre): ?>
+                <option value="<?php echo htmlspecialchars($centre['centre_id']); ?>"><?php echo htmlspecialchars($centre['centre_name']); ?></option>
+            <?php endforeach; ?>
+            </select>
+        </div>
+
+    <!-- Submit Button -->
+    <div class="mt-6">
+        <button type="submit" class="bg-govt-blue text-white px-4 py-2 rounded-md hover:bg-govt-dark-blue transition-colors">Log Visit</button>
+    </div>
+</form>
+    <?php elseif ($action === 'view_visit'): ?>
+    <div id="notification-buttons" class="flex justify-between items-end gap-4 mt-4">
+        <h1 class="text-lg md:text-3xl font-bold text-govt-blue mb-6 mt-4">View Visits</h1>
+        <a href="?action=log_visit" class="bg-govt-blue text-white px-4 py-2 rounded-md text-center hover:bg-blue-600 mb-4 "> + Log a visit</a>           
+    </div>
+    <div class="bg-white rounded-lg shadow-md md:overflow-hidden overflow-x-scroll">
+    <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visit Date</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visit Time</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Centre Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <?php if (empty($visits)): ?>
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">No visits found.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($visits as $visit): ?>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($visit['visit_date']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($visit['visit_time']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($visit['centre_name']); ?></td>
+                            <td class="px-6 py-4"><?php echo htmlspecialchars($visit['notes']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>     
     </main>
     <?php endif; ?>                      
 
