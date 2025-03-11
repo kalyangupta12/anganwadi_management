@@ -771,8 +771,6 @@ function uploadFile($file, $uploadDir) {
 
             <!-- Desktop Navigation (Hidden on mobile) -->
             <div class="hidden md:flex gap-6">
-                <a href="workers/view.php" class="text-white text-lg hover:text-govt-light-blue">Workers</a>
-                <a href="centres/view.php" class="text-white text-lg hover:text-govt-light-blue">Centres</a>
                 <a href="../logout.php" class="font-bold text-white text-xl hover:text-govt-light-blue">Logout</a>
             </div>
 
@@ -857,7 +855,7 @@ function uploadFile($file, $uploadDir) {
         </div>
         <div>
             <h2 class="text-xl font-semibold text-govt-orange">Reports</h2>
-            <p class="text-gray-600">View and address the reports of Supervisor</p>
+            <p class="text-gray-600">View/Add the reports of Supervisor</p>
         </div>
     </div>
 </a>
@@ -877,7 +875,7 @@ function uploadFile($file, $uploadDir) {
         </div>
         <div>
             <h2 class="text-xl font-semibold text-govt-red">Issues</h2>
-            <p class="text-gray-600">View and address the issues of Supervisor</p>
+            <p class="text-gray-600">View/Add the issues</p>
         </div>
     </div>
 </a>
