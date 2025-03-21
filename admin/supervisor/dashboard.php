@@ -1364,8 +1364,8 @@ function uploadFile($file, $uploadDir)
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Id</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Description</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report File</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted On</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Viewed</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted On</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                         </tr>
                     </thead>
@@ -1385,7 +1385,7 @@ function uploadFile($file, $uploadDir)
                                 <?php if ($reports['verified'] == 0): ?>
                                     <td class="px-6 py-4 text-govt-orange">Pending</td>
                                 <?php else: ?>
-                                    <td class="px-6 py-4 text-govt-green">Verified</td>
+                                    <td class="px-6 py-4 text-govt-green">Viewed</td>
                                 <?php endif; ?>
                                 <td class="px-6 py-4"><?php echo htmlspecialchars($reports['created_at']); ?></td>
                                 <td class="px-6 py-4">
