@@ -31,7 +31,6 @@ The Anganwadi Management System is a comprehensive digital solution designed to 
 - Educational resources and welfare programs
 
 ### Technical Features
-- **Offline Functionality**: Works in areas with limited internet connectivity
 - **Data Security**: End-to-end encryption and secure authentication
 - **Real-time Synchronization**: Automatic data syncing when internet is available
 - **User-Friendly Interface**: Intuitive design for users with limited technical expertise
