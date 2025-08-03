@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "User not found in the users table.";
             }
         } else {
-            $error = "Email not found in any role table.";
+            $error = "Email not found! You are not registered.";
         }
     } elseif (isset($_POST['verify_otp'])) {
         // Step 2: Verify OTP

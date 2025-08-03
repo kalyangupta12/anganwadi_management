@@ -204,9 +204,11 @@
           <a href="#" class="hover:underline">Government of Assam</a>
         </div>
         <div class="flex items-center space-x-4 text-xs">
-          <a href="#" class="hover:underline">English</a>
+          <!-- <a href="#" class="hover:underline">English</a>
           <a href="#" class="hover:underline">हिंदी</a>
-          <a href="#" class="hover:underline">অসমীয়া</a>
+            <a href="#" class="hover:underline">অসমীয়া</a> -->
+            <span class="font-semibold text-white">জয় আই অসম</span>
+
         </div>
       </div>
     </div>
@@ -226,7 +228,7 @@
                 Pratham Path
               </h1>
               <p class="text-sm text-govt-text-gray">
-                शिक्षार अधिकार - Education Department, Assam
+                শিক্ষাৰ অধিকাৰ - শিক্ষা বিভাগ, অসম
               </p>
             </div>
           </div>
@@ -322,41 +324,45 @@
           </p>
 
           <div class="flex flex-wrap gap-4">
-            <a
-              href="#"
-              class="inline-flex items-center bg-govt-blue hover:bg-govt-dark-blue text-white px-6 py-3 rounded-md transition-colors">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c0 2 1 3 3 3h6c2 0 3-1 3-3v-5" />
-              </svg>
-              Pregnant Lady Resources
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center border border-govt-blue/20 text-govt-blue hover:bg-govt-blue/5 px-6 py-3 rounded-md transition-colors">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path
-                  d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-              </svg>
-              Lactating Women Resources
-            </a>
-          </div>
+  <a
+    href="#"
+    id="pregnant-resources-btn"
+    class="inline-flex items-center bg-govt-blue hover:bg-govt-dark-blue text-white px-6 py-3 rounded-md transition-colors">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5 mr-2"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c0 2 1 3 3 3h6c2 0 3-1 3-3v-5" />
+    </svg>
+    Pregnant Lady Resources
+  </a>
+  <a
+    href="#"
+    id="lactating-resources-btn"
+    class="inline-flex items-center border border-govt-blue/20 text-govt-blue hover:bg-govt-blue/5 px-6 py-3 rounded-md transition-colors">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5 mr-2"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round">
+      <path
+        d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+    </svg>
+    Lactating Women Resources
+  </a>
+</div>
+
+
 
           <!-- Announcements -->
           <div
@@ -464,7 +470,7 @@
         </p>
       </div>
 
-      <div class="offline-indicator mb-8">
+      <!-- <div class="offline-indicator mb-8">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -484,7 +490,7 @@
         </svg>
         <span>Our application works offline! Perfect for areas with limited
           internet connectivity.</span>
-      </div>
+      </div> -->
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Feature 1 -->
@@ -576,30 +582,13 @@
         <!-- Feature 4 -->
         <div class="feature-card delay-300">
           <div class="feature-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-cloud-off">
-              <path d="m2 2 20 20" />
-              <path
-                d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193" />
-              <path
-                d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07" />
-            </svg>
+            <img src="mother.svg" class="h-12 w-12" alt="Pregnant Lady Icon" />
           </div>
           <h3 class="text-lg font-semibold mb-2 text-govt-dark-blue">
-            Offline Functionality
+            Pregnant Lady Resources
           </h3>
-          <p class="text-govt-text-gray text-sm">
-            Full operational capability in areas with limited internet
-            connectivity, with data sync when connectivity is restored.
+          <p class="text-govt-text-gray text-sm"></p>
+            Access government schemes, nutrition support, and health entitlements for pregnant women through Anganwadi centres in Assam.
           </p>
         </div>
 
@@ -1565,7 +1554,183 @@
       </div>
     </div>
   </footer>
+<!-- Modal Container - Add this at the end of your body, before closing body tag -->
+<div id="resources-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true"></div>
 
+    <!-- Modal positioning -->
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
+      <!-- Close button -->
+      <button id="close-modal" class="absolute top-4 right-4 text-white hover:text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Modal header -->
+      <div class="bg-govt-blue text-white px-6 py-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-white text-govt-blue flex items-center justify-center mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">Pratham Path – Pregnant and Lactating Women Resources (Assam, 2025)</h3>
+            <p class="text-sm text-blue-100">সকলৰ বাবে, সকলৰে পৰা, সকলৰে দ্বাৰা।</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal content -->
+      <div class="px-6 pt-5 pb-6 max-h-[70vh] overflow-y-auto">
+        <div class="bg-govt-light-blue/50 p-4 rounded-md mb-6 border-l-4 border-govt-blue">
+          <h4 class="font-bold text-govt-dark-blue mb-2">Government Schemes, Benefits, and Latest Measures</h4>
+          <p class="text-govt-text-gray text-sm">Latest policy initiatives and support schemes for pregnant and lactating women in Assam.</p>
+        </div>
+
+        <!-- Section 1 -->
+        <div class="mb-8">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 rounded-full bg-govt-blue/10 text-govt-blue flex items-center justify-center mr-3 shrink-0">
+              <span class="font-bold">1</span>
+            </div>
+            <h4 class="text-lg font-bold text-govt-dark-blue">Key Nutrition and Health Entitlements</h4>
+          </div>
+          
+          <div class="space-y-4 pl-11">
+            <div>
+              <h5 class="font-semibold text-govt-blue">Supplementary Nutrition:</h5>
+              <p class="text-govt-text-gray">All pregnant and lactating women are entitled to free meals and ration support through the Anganwadi system, under the Saksham Anganwadi & POSHAN 2.0 programme. The food basket typically includes fortified rice/wheat, pulses, oil, eggs (as per state policy), jaggery, and seasonal vegetables, aligned to bridge crucial dietary gaps.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Cash Assistance:</h5>
+              <ul class="list-disc pl-5 text-govt-text-gray space-y-2">
+                <li><span class="font-medium">Janani Suraksha Yojana (JSY):</span> Rural mothers delivering in public health institutions receive ₹1,400 cash assistance per delivery (inclusive of pre- and post-natal services).</li>
+                <li><span class="font-medium">Tea Garden Women:</span> Pregnant women in tea garden areas are eligible for "Wage Compensation Scheme," which grants ₹15,000 in four instalments to support maternal nutrition and reduce livelihood loss.</li>
+                <li><span class="font-medium">Maternity Benefit (for Construction Workers):</span> Registered construction workers receive ₹20,000 per childbirth (up to two times).</li>
+                <li><span class="font-medium">Pradhan Mantri Matru Vandana Yojana (PMMVY):</span> Provides a maternity benefit of ₹5,000 for the first live birth (in three instalments, linked to check-ups and child immunization).</li>
+                <li><span class="font-medium">Matri Suraksha Yojana:</span> Newly expanded, offers ₹10,000 to pregnant women from economically weaker sections.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Free Healthcare:</h5>
+              <p class="text-govt-text-gray">Under the Janani Shishu Suraksha Karyakram (JSSK), institutional delivery, C-section, essential drugs, diagnostics, and diet are free for pregnant women in government hospitals. Sick newborns (up to 30 days) receive free treatment, transport, and food.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Anaemia and Micronutrient Support:</h5>
+              <p class="text-govt-text-gray">Lactating women get iron, folic acid, and calcium supplements, distributed at Village Health & Nutrition Days (VHNDs), and during child immunization visits.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="mb-8">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 rounded-full bg-govt-blue/10 text-govt-blue flex items-center justify-center mr-3 shrink-0">
+              <span class="font-bold">2</span>
+            </div>
+            <h4 class="text-lg font-bold text-govt-dark-blue">Service Delivery and Recent Developments</h4>
+          </div>
+          
+          <div class="space-y-4 pl-11">
+            <div>
+              <h5 class="font-semibold text-govt-blue">Anganwadi Reach & Coverage:</h5>
+              <p class="text-govt-text-gray">There are more than 62,000 Anganwadi centres in Assam as of 2025, covering over 3 million beneficiaries (children, pregnant and lactating women). Centers provide a package of six services—including supplementary nutrition, immunization, health check-ups and monitoring, counselling, and preschool education.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Infrastructure Upgrades:</h5>
+              <p class="text-govt-text-gray">Over 2,300 model Anganwadi centres are newly constructed, with plans for 6,691 more—with improved toilets, kitchens, electricity, and drinking water. Jal Jeevan Mission installed 28,833 water pumps to boost clean water in AWCs as of 2025.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Legal Mandate:</h5>
+              <p class="text-govt-text-gray">As directed by the Gauhati High Court, every pregnant woman and lactating mother must receive entitled meals free of charge during pregnancy and for six months after childbirth at her local Anganwadi centre.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="mb-8">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 rounded-full bg-govt-blue/10 text-govt-blue flex items-center justify-center mr-3 shrink-0">
+              <span class="font-bold">3</span>
+            </div>
+            <h4 class="text-lg font-bold text-govt-dark-blue">Education, Empowerment, and Welfare</h4>
+          </div>
+          
+          <div class="space-y-4 pl-11">
+            <div>
+              <h5 class="font-semibold text-govt-blue">Awareness Programs:</h5>
+              <p class="text-govt-text-gray">Regular workshops on pregnancy care, newborn care, breastfeeding, maternal nutrition, infant immunization, menstrual hygiene, and child development.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Referral and Support:</h5>
+              <p class="text-govt-text-gray">Special focus on timely referral for high-risk pregnancies, postpartum check-ups, and maternal mental health initiatives.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Women's Welfare:</h5>
+              <p class="text-govt-text-gray">One Stop Centres (OSCs), Sakhi Niwas working women's hostels, Palna creche facilities, and Shakti Sadans are operational for comprehensive women's support and protection in the state.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Vocational and Self-Help:</h5>
+              <p class="text-govt-text-gray">The government undertakes skills/vocational training for women, especially destitute and single mothers, to promote self-employment and entrepreneurship.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="mb-2">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 rounded-full bg-govt-blue/10 text-govt-blue flex items-center justify-center mr-3 shrink-0">
+              <span class="font-bold">4</span>
+            </div>
+            <h4 class="text-lg font-bold text-govt-dark-blue">How to Access Support</h4>
+          </div>
+          
+          <div class="space-y-4 pl-11">
+            <div>
+              <h5 class="font-semibold text-govt-blue">Registration:</h5>
+              <p class="text-govt-text-gray">Visit your local Anganwadi Centre with an Aadhaar or valid ID. Priority is given to all women in the service area, especially BPL and marginalized groups.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Participation:</h5>
+              <p class="text-govt-text-gray">Attend monthly health/nutrition days, collect rations (usually bi-monthly), and enrol for cash entitlements as per scheme guidelines.</p>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-govt-blue">Stay Updated:</h5>
+              <p class="text-govt-text-gray">Latest scheme announcements and academic registrations (e.g., for Pratham Path) are frequently updated at official Assam government and district websites.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-between">
+        <div class="flex items-center text-govt-text-gray text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Last updated: June 1, 2025
+        </div>
+        <div>
+          <button class="bg-govt-blue hover:bg-govt-dark-blue text-white px-6 py-2 rounded-md transition-colors">Download PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   <script>
     const statCounters = document.querySelectorAll(".stat-counter");
     const observerOptions = {
@@ -1645,6 +1810,47 @@
       });
     });
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('resources-modal');
+    const openButtons = [
+      document.getElementById('pregnant-resources-btn'),
+      document.getElementById('lactating-resources-btn')
+    ];
+    const closeButton = document.getElementById('close-modal');
+
+    // Open modal
+    openButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+      });
+    });
+
+    // Close modal
+    closeButton.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto'; // Re-enable scrolling
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+      }
+    });
+  });
+</script>
 </body>
 
 </html>
